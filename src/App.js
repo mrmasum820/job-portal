@@ -1,24 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { RouterProvider } from "react-router-dom";
+import routes from "./routes/routes";
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import auth from "./firebase/firebase.config";
+import { useDispatch } from "react-redux";
+import { getUser, setUser, toggleLoading } from "./features/auth/authSlice";
+import { Toaster } from "react-hot-toast";
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        console.log(user);
+        dispatch(getUser(user.email))
+      } else {
+        dispatch(toggleLoading())
+      }
+    })
+  }, [dispatch])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Toaster />
+      <RouterProvider router={routes} />
+    </>
   );
 }
 
